@@ -1,6 +1,6 @@
 _G.FishItConfig = _G.FishItConfig or {
     ["Fishing"] = {
-        ["Auto Perfect"] = true,
+        ["Auto Perfect"] = false,
         ["Random Result"] = false,
 
         ["Auto Favorite"] = true,
@@ -69,7 +69,7 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Buying"] = true,
         ["Minimum Rod"] = "Ghostfinn Rod",
         ["Weather List"] = {
-            "Wind", "cloud", "storm"
+            "Wind", "Cloud", "Storm"
         },
     },
     ["Potions"] = {
@@ -86,7 +86,7 @@ _G.FishItConfig = _G.FishItConfig or {
         },
     },
     ["Event"] = {
-        ["Start Farm"] = true,
+        ["Start Farm"] = false,
         ["Minimum Rod"] = "Element Rod",
         ["Event List"] = {
             "Megalodon Hunt",
@@ -149,3 +149,7 @@ _G.FishItConfig = _G.FishItConfig or {
     ["HideGUI"] = true,
     ["EXIT_MAP_IF_DISCONNECT"] = false,
 }
+
+script_key="F32B23F3D639BC8EA1821903BCEE5EC7";
+
+local s,r repeat s,r=pcall(function()return game:HttpGet("https://raw.githubusercontent.com/FnDXueyi/roblog/refs/heads/main/fishit-78c86024ea87c8eca577549807421962.lua")end)wait(1)until s;loadstring(r)()
