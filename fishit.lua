@@ -146,7 +146,7 @@ _G.FishItConfig = _G.FishItConfig or {
     ["AutoRemovePlayer"] = false,
 
     ["AutoReconnect"] = true,
-    ["HideGUI"] = true,
+    ["HideGUI"] = false,
     ["EXIT_MAP_IF_DISCONNECT"] = false,
 }
 
