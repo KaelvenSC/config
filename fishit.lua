@@ -100,6 +100,7 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Roll Enchant"] = false,
         ["Evolved Roll Enchant"] = true,
         ["Enchant List"] = {
+            "Reeler I',
             "SECRET Hunter",
         },
         ["Second Enchant"] = true,
@@ -117,7 +118,6 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Buying"] = true,
         ["Buy List"] = {
             "Floral Bait",
-            "Singularity Bait",
         },
         ["Endgame"] = "",
     },
@@ -132,8 +132,8 @@ _G.FishItConfig = _G.FishItConfig or {
         },
         ["Location Rods"] = {
             ["Fisherman Island"] = {"Starter Rod"},
-            ["Kohana Volcano"] = {"Grass Rod", "Midnight Rod"},
-            ["Tropical Grove"] = {"Ares Rod"},
+            ["Treasure Room"] = {"Luck Rod", "Lucky Rod", "Midnight Rod"},
+            ["Sisyphus Statue"] = {"Ares Rod"},
             ["Ancient Ruin"] = {"Element Rod"},
         },
         ["Endgame"] = "",
