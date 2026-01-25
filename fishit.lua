@@ -116,10 +116,6 @@ _G.FishItConfig = _G.FishItConfig or {
     ["Bait List"] = {
         ["Auto Buying"] = true,
         ["Buy List"] = {
-            "Midnight Bait",
-            "Chroma Bait",
-            "Corrupt Bait",
-            "Aether Bait",
             "Floral Bait",
             "Singularity Bait",
         },
@@ -128,7 +124,6 @@ _G.FishItConfig = _G.FishItConfig or {
     ["Rod List"] = {
         ["Auto Buying"] = true,
         ["Buy List"] = {
-            "Grass Rod",
             "Midnight Rod",
             "Lava Rod",
             "Lucky Rod",
@@ -138,7 +133,7 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Location Rods"] = {
             ["Fisherman Island"] = {"Starter Rod"},
             ["Kohana Volcano"] = {"Grass Rod", "Midnight Rod"},
-            ["Tropical Grove"] = {"Astral Rod"},
+            ["Tropical Grove"] = {"Ares Rod"},
             ["Ancient Ruin"] = {"Element Rod"},
         },
         ["Endgame"] = "",
