@@ -1,6 +1,6 @@
 _G.FishItConfig = _G.FishItConfig or {
     ["Fishing"] = {
-        ["Auto Perfect"] = false,
+        ["Auto Perfect"] = true,
         ["Random Result"] = false,
 
         ["Auto Favorite"] = true,
@@ -116,7 +116,7 @@ _G.FishItConfig = _G.FishItConfig or {
     ["Bait List"] = {
         ["Auto Buying"] = true,
         ["Buy List"] = {
-            "Floral Bait",
+            "Midnight Bait",
         },
         ["Endgame"] = "",
     },
@@ -124,24 +124,21 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Buying"] = true,
         ["Buy List"] = {
             "Midnight Rod",
-            "Lava Rod",
-            "Lucky Rod",
             "Luck Rod",
             "Ares Rod",
         },
         ["Location Rods"] = {
             ["Fisherman Island"] = {"Starter Rod"},
-            ["Treasure Room"] = {"Luck Rod", "Lucky Rod", "Midnight Rod"},
-            ["Sisyphus Statue"] = {"Ares Rod"},
+            ["Treasure Room"] = {"Luck Rod", "Midnight Rod"},
             ["Treasure Room"] = {"Element Rod"},
         },
         ["Endgame"] = "",
     },
 
     ["ExtremeFpsBoost"] = true,
-    ["UltimatePerformance"] = true,
-    ["Disable3DRender"] = true,
-    ["AutoRemovePlayer"] = true,
+    ["UltimatePerformance"] = false,
+    ["Disable3DRender"] = false,
+    ["AutoRemovePlayer"] = false,
 
     ["AutoReconnect"] = true,
     ["HideGUI"] = false,
