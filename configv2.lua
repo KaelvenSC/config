@@ -42,9 +42,9 @@ _G.FishItConfig = _G.FishItConfig or {
     },
     ["Doing Quest"] = {
         ["Auto Ghostfinn Rod"] = true,
-        ["Auto Element Rod"] = true,
+        ["Auto Element Rod"] = false
         ["Auto Diamond Rod"] = false,
-        ["Unlock Ancient Ruin"] = true,
+        ["Unlock Ancient Ruin"] = false,
         ["Allowed Sacrifice"] = {
             "Ghost Shark",
             "Cryoshade Glider",
@@ -129,8 +129,7 @@ _G.FishItConfig = _G.FishItConfig or {
         },
         ["Location Rods"] = {
             ["Fisherman Island"] = {"Starter Rod"},
-            ["Ocean"] = {"Midnight Rod"},
-            ["Treasure Room"] = {"Element Rod", "Luck Rod"},
+            ["Treasure Room"] = {"Element Rod", "Luck Rod", "Ghostfinn Rod", "Midnight Rod"},
         },
         ["Endgame"] = "",
     },
