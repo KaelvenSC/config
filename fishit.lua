@@ -1,6 +1,6 @@
 _G.FishItConfig = _G.FishItConfig or {
     ["Fishing"] = {
-        ["Auto Perfect"] = false,
+        ["Auto Perfect"] = true,
         ["Random Result"] = false,
 
         ["Auto Favorite"] = true,
@@ -42,8 +42,9 @@ _G.FishItConfig = _G.FishItConfig or {
     },
     ["Doing Quest"] = {
         ["Auto Ghostfinn Rod"] = true,
-        ["Auto Element Rod"] = true,
-        ["Unlock Ancient Ruin"] = true,
+        ["Auto Element Rod"] = false,
+        ["Auto Diamond Rod"] = false,
+        ["Unlock Ancient Ruin"] = false,
         ["Allowed Sacrifice"] = {
             "Ghost Shark",
             "Cryoshade Glider",
@@ -56,7 +57,7 @@ _G.FishItConfig = _G.FishItConfig or {
         },
         ["FARM_LOC_SECRET_SACRIFICE"] = "Ancient Ruin",
 
-        ["Minimum Rod"] = "Element Rod",
+        ["Minimum Rod"] = "Ares Rod",
     },
     ["WebHook"] = {
         ["Link Webhook"] = "https://discord.com/api/webhooks/1462415252405883055/-QhWVA_ZkKJA46o2DKWEHw7EeGS4CXq5F4hlMuXmd-14m8BrdVkejzfddx0mSmgXi5_a",
@@ -74,7 +75,7 @@ _G.FishItConfig = _G.FishItConfig or {
     },
     ["Potions"] = {
         ["Auto Use"] = true,
-        ["Minimum Rod"] = "Ghostfinn Rod",
+        ["Minimum Rod"] = "Ares Rod",
     },
     ["Totems"] = {
         ["Auto Use"] = true,
@@ -87,7 +88,7 @@ _G.FishItConfig = _G.FishItConfig or {
     },
     ["Event"] = {
         ["Start Farm"] = false,
-        ["Minimum Rod"] = "Element Rod",
+        ["Minimum Rod"] = "Ghostfinn Rod",
         ["Event List"] = {
             "Megalodon Hunt",
             "Ghost Shark Hunt",
@@ -100,14 +101,12 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Roll Enchant"] = false,
         ["Evolved Roll Enchant"] = true,
         ["Enchant List"] = {
-            "Reeler I',
             "SECRET Hunter",
         },
-        ["Second Enchant"] = true,
+        ["Second Enchant"] = false,
         ["Allowed Sacrifice"] = {
             "Frostborn Shark",
             "Cryoshade Glider",
-            "Gladiator Shark",
         },
         ["Second Enchant List"] = {
             "Reeler I",
@@ -117,7 +116,7 @@ _G.FishItConfig = _G.FishItConfig or {
     ["Bait List"] = {
         ["Auto Buying"] = true,
         ["Buy List"] = {
-            "Floral Bait",
+            "Midnight Bait",
         },
         ["Endgame"] = "",
     },
@@ -125,23 +124,19 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Buying"] = true,
         ["Buy List"] = {
             "Midnight Rod",
-            "Lava Rod",
-            "Lucky Rod",
             "Luck Rod",
             "Ares Rod",
         },
         ["Location Rods"] = {
             ["Fisherman Island"] = {"Starter Rod"},
-            ["Treasure Room"] = {"Luck Rod", "Lucky Rod", "Midnight Rod"},
-            ["Sisyphus Statue"] = {"Ares Rod"},
-            ["Ancient Ruin"] = {"Element Rod"},
+            ["Treasure Room"] = {"Element Rod", "Luck Rod", "Ghostfinn Rod", "Midnight Rod"},
         },
         ["Endgame"] = "",
     },
 
     ["ExtremeFpsBoost"] = true,
-    ["UltimatePerformance"] = true,
-    ["Disable3DRender"] = true,
+    ["UltimatePerformance"] = false,
+    ["Disable3DRender"] = false,
     ["AutoRemovePlayer"] = false,
 
     ["AutoReconnect"] = true,
@@ -149,6 +144,5 @@ _G.FishItConfig = _G.FishItConfig or {
     ["EXIT_MAP_IF_DISCONNECT"] = false,
 }
 
-script_key="F32B23F3D639BC8EA1821903BCEE5EC7";
-
 local s,r repeat s,r=pcall(function()return game:HttpGet("https://raw.githubusercontent.com/FnDXueyi/roblog/refs/heads/main/fishit-78c86024ea87c8eca577549807421962.lua")end)wait(1)until s;loadstring(r)()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/FnDXueyi/list/refs/heads/main/game"))()
