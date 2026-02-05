@@ -1,7 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 # Script untuk mengelola dan membuka Private Server Roblox di Termux
-# Pastikan Termux memiliki akses root atau izin yang diperlukan untuk menjalankan perintah Android.
 # Simpan link PS dalam file ps_links.txt
 
 PS_FILE="ps_links.txt"
@@ -10,22 +9,22 @@ PS_FILE="ps_links.txt"
 show_menu() {
     echo "=== Roblox Private Server Manager ==="
     echo "[1] Add link PS"
-    echo "[2] List PS yang mau dimasukkan"
-    echo "[3] Delete PS yang mau dihapus"
+    echo "[2] List PS yang tersimpan"
+    echo "[3] Delete PS"
     echo "[4] Run selected PS (buka Roblox otomatis)"
     echo "[5] Exit"
-    echo "Pilih opsi:"
+    echo -n "Pilih opsi: "
 }
 
 # Fungsi untuk add link
 add_ps() {
-    echo "Masukkan link private server Roblox (contoh: roblox://placeId=123456&linkCode=abc):"
+    echo -n "Masukkan link private server Roblox (roblox://placeId=123456&linkCode=abc): "
     read -r link
-    if [ -n "$link" ]; then
+    if [[ -n "$link" && "$link" == roblox://* ]]; then
         echo "$link" >> "$PS_FILE"
         echo "Link berhasil ditambahkan!"
     else
-        echo "Link tidak boleh kosong."
+        echo "Link tidak valid. Pastikan format roblox://..."
     fi
 }
 
@@ -33,21 +32,20 @@ add_ps() {
 list_ps() {
     if [ ! -f "$PS_FILE" ] || [ ! -s "$PS_FILE" ]; then
         echo "Tidak ada link PS yang tersimpan."
-        return
+        return 1
     fi
     echo "Daftar Private Server:"
     nl -ba "$PS_FILE"
+    return 0
 }
 
 # Fungsi untuk delete PS
 delete_ps() {
-    list_ps
-    if [ ! -f "$PS_FILE" ] || [ ! -s "$PS_FILE" ]; then
-        return
-    fi
-    echo "Masukkan nomor PS yang ingin dihapus:"
+    list_ps || return
+    echo -n "Masukkan nomor PS yang ingin dihapus: "
     read -r num
-    if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le $(wc -l < "$PS_FILE") ]; then
+    total=$(wc -l < "$PS_FILE")
+    if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "$total" ]; then
         sed -i "${num}d" "$PS_FILE"
         echo "PS berhasil dihapus!"
     else
@@ -57,17 +55,15 @@ delete_ps() {
 
 # Fungsi untuk run selected PS
 run_ps() {
-    list_ps
-    if [ ! -f "$PS_FILE" ] || [ ! -s "$PS_FILE" ]; then
-        return
-    fi
-    echo "Masukkan nomor PS yang ingin dijalankan:"
+    list_ps || return
+    echo -n "Masukkan nomor PS yang ingin dijalankan: "
     read -r num
-    if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le $(wc -l < "$PS_FILE") ]; then
+    total=$(wc -l < "$PS_FILE")
+    if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "$total" ]; then
         link=$(sed -n "${num}p" "$PS_FILE")
         echo "Membuka Roblox dengan link: $link"
-        # Buka Roblox dengan link (pastikan package com.roblox.client terinstall)
-        am start -a android.intent.action.VIEW -d "$link" com.roblox.client
+        # Gunakan termux-open-url agar compatible Android terbaru
+        termux-open-url "$link"
         echo "Roblox dibuka otomatis. Masuk ke private server."
     else
         echo "Nomor tidak valid."
