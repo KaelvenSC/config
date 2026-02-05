@@ -117,6 +117,7 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Buying"] = true,
         ["Buy List"] = {
             "Midnight Bait",
+            "Corrupt Bait",
         },
         ["Endgame"] = "",
     },
