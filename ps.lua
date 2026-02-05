@@ -20,7 +20,9 @@ for i = 1, #PS do
 end
 
 io.write("Nomor: ")
-local pilih = tonumber(io.read())
+local tty = io.open("/dev/tty", "r")
+local pilih = tonumber(tty:read("*l"))
+tty:close()
 
 if not pilih or not PS[pilih] then
   print("Pilihan salah")
