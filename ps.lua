@@ -1,17 +1,28 @@
 -- ===== CONFIG =====
-local PKG = "com.roblox.clientb"
-
 local PS = {
-  "https://www.roblox.com/share?code=91fbc202237dca4b820fcdec8723282b&type=Server",
-  "https://www.roblox.com/share?code=aeae86301c1abc4e857dca2d60eef8fe&type=Server"
+  "https://www.roblox.com/share?code=PS_CODE_1&type=Server",
+  "https://www.roblox.com/share?code=PS_CODE_2&type=Server"
 }
-
-local DELAY = 12
+local DELAY = 10
 -- ==================
 
-print("Pilih Private Server:")
-for i = 1, #PS do
-  print(i .. ") PS " .. i)
+-- ambil semua package roblox
+local pkgs = {}
+local p = io.popen("pm list packages | grep roblox")
+for line in p:lines() do
+  local pkg = line:match("package:(.+)")
+  if pkg then table.insert(pkgs, pkg) end
+end
+p:close()
+
+if #pkgs == 0 then
+  print("❌ Roblox tidak ditemukan")
+  os.exit()
+end
+
+print("Pilih Roblox:")
+for i,v in ipairs(pkgs) do
+  print(i .. ") " .. v)
 end
 
 io.write("Nomor: ")
@@ -19,23 +30,35 @@ local tty = io.open("/dev/tty","r")
 local pilih = tonumber(tty and tty:read("*l") or io.read())
 if tty then tty:close() end
 
-if not pilih or not PS[pilih] then
-  print("Pilihan salah")
+local PKG = pkgs[pilih]
+if not PKG then
+  print("❌ Pilihan salah")
   os.exit()
 end
 
-print("Buka Roblox clone...")
+print("Pilih Private Server:")
+for i=1,#PS do print(i..") PS "..i) end
+io.write("Nomor: ")
+tty = io.open("/dev/tty","r")
+local ps = tonumber(tty and tty:read("*l") or io.read())
+if tty then tty:close() end
+if not PS[ps] then
+  print("❌ PS salah")
+  os.exit()
+end
+
+print("Buka Roblox...")
 os.execute(
   "am start -a android.intent.action.MAIN " ..
   "-c android.intent.category.LAUNCHER " ..
   "-p " .. PKG
 )
 
-os.execute("sleep " .. DELAY)
+os.execute("sleep "..DELAY)
 
-print("Join Private Server...")
+print("Join PS...")
 os.execute(
-  'am start -a android.intent.action.VIEW -d "' .. PS[pilih] .. '"'
+  'am start -a android.intent.action.VIEW -d "'..PS[ps]..'"'
 )
 
 os.exit()
