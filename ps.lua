@@ -28,7 +28,7 @@ if not pilih or not PS[pilih] then
 end
 
 print("Buka Roblox...")
-os.execute("am start -n " .. PKG .. "/com.roblox.client.ActivitySplash")
+os.execute("am start -n " .. PKG .. "/com.roblox.clientb.ActivitySplash")
 
 os.execute("sleep " .. DELAY)
 
