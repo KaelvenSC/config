@@ -33,7 +33,7 @@ if not pilih or not PS[pilih] then
 end
 
 print("Buka Roblox...")
-os.execute("monkey -p " .. PKG .. " -c android.intent.category.LAUNCHER 1")
+os.execute("cmd monkey -p " .. PKG .. " -c android.intent.category.LAUNCHER 1")
 
 os.execute("sleep " .. DELAY)
 
