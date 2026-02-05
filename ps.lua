@@ -1,6 +1,6 @@
 -- ===== CONFIG (EDIT SENDIRI) =====
 
--- package Roblox (ganti kalau clone)
+-- package Roblox clone (punya lu)
 local PKG = "com.roblox.clientb"
 
 -- daftar Private Server
@@ -10,7 +10,7 @@ local PS = {
 }
 
 -- delay sebelum join (detik)
-local DELAY = 8
+local DELAY = 10
 
 -- =================================
 
@@ -20,9 +20,16 @@ for i = 1, #PS do
 end
 
 io.write("Nomor: ")
+
+-- FIX stdin biar ga auto-enter
+local pilih
 local tty = io.open("/dev/tty", "r")
-local pilih = tonumber(tty:read("*l"))
-tty:close()
+if tty then
+  pilih = tonumber(tty:read("*l"))
+  tty:close()
+else
+  pilih = tonumber(io.read())
+end
 
 if not pilih or not PS[pilih] then
   print("Pilihan salah")
