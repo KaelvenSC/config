@@ -1,34 +1,35 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-# Script untuk mengelola dan membuka Private Server Roblox di Termux
-# Simpan link PS dalam file ps_links.txt
+# Script Roblox Private Server Manager untuk Termux
+# Bisa pakai link web PS dan buka Roblox langsung (com.roblox.clientb)
 
 PS_FILE="ps_links.txt"
 
-# Fungsi untuk menampilkan menu
+# Fungsi menu
 show_menu() {
     echo "=== Roblox Private Server Manager ==="
     echo "[1] Add link PS"
-    echo "[2] List PS yang tersimpan"
+    echo "[2] List PS"
     echo "[3] Delete PS"
-    echo "[4] Run selected PS (buka Roblox otomatis)"
-    echo "[5] Exit"
+    echo "[4] Open Roblox app (com.roblox.clientb)"
+    echo "[5] Show PS link (copy-paste untuk join)"
+    echo "[6] Exit"
     echo -n "Pilih opsi: "
 }
 
-# Fungsi untuk add link
+# Add link PS
 add_ps() {
-    echo -n "Masukkan link private server Roblox (roblox://placeId=123456&linkCode=abc): "
+    echo -n "Masukkan link Private Server Roblox (https://www.roblox.com/share?code=...): "
     read -r link
-    if [[ -n "$link" && "$link" == roblox://* ]]; then
+    if [[ -n "$link" && "$link" == https://www.roblox.com/share?code=* ]]; then
         echo "$link" >> "$PS_FILE"
         echo "Link berhasil ditambahkan!"
     else
-        echo "Link tidak valid. Pastikan format roblox://..."
+        echo "Link tidak valid. Pastikan format https://www.roblox.com/share?code=..."
     fi
 }
 
-# Fungsi untuk list PS
+# List PS
 list_ps() {
     if [ ! -f "$PS_FILE" ] || [ ! -s "$PS_FILE" ]; then
         echo "Tidak ada link PS yang tersimpan."
@@ -39,7 +40,7 @@ list_ps() {
     return 0
 }
 
-# Fungsi untuk delete PS
+# Delete PS
 delete_ps() {
     list_ps || return
     echo -n "Masukkan nomor PS yang ingin dihapus: "
@@ -53,18 +54,23 @@ delete_ps() {
     fi
 }
 
-# Fungsi untuk run selected PS
-run_ps() {
+# Open Roblox app
+open_roblox() {
+    echo "Membuka Roblox app..."
+    am start -n com.roblox.clientb/com.roblox.client.LaunchActivity
+    echo "Roblox dibuka. Join server manual melalui link."
+}
+
+# Show link PS
+show_link() {
     list_ps || return
-    echo -n "Masukkan nomor PS yang ingin dijalankan: "
+    echo -n "Masukkan nomor PS yang ingin ditampilkan link: "
     read -r num
     total=$(wc -l < "$PS_FILE")
-    if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "$total" ]; then
+    if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "$total" ]]; then
         link=$(sed -n "${num}p" "$PS_FILE")
-        echo "Membuka Roblox dengan link: $link"
-        # Gunakan termux-open-url agar compatible Android terbaru
-        termux-open-url "$link"
-        echo "Roblox dibuka otomatis. Masuk ke private server."
+        echo "Link PS: $link"
+        echo "Copy-paste link ini di browser untuk join server."
     else
         echo "Nomor tidak valid."
     fi
@@ -78,8 +84,9 @@ while true; do
         1) add_ps ;;
         2) list_ps ;;
         3) delete_ps ;;
-        4) run_ps ;;
-        5) echo "Keluar."; exit 0 ;;
+        4) open_roblox ;;
+        5) show_link ;;
+        6) echo "Keluar."; exit 0 ;;
         *) echo "Pilihan tidak valid. Coba lagi." ;;
     esac
     echo ""
