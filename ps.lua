@@ -1,18 +1,15 @@
--- ===== CONFIG (EDIT SENDIRI) =====
+-- ===== CONFIG =====
 
--- package Roblox clone (punya lu)
 local PKG = "com.roblox.clientb"
 
--- daftar Private Server
 local PS = {
   "https://www.roblox.com/share?code=91fbc202237dca4b820fcdec8723282b&type=Server",
   "https://www.roblox.com/share?code=aeae86301c1abc4e857dca2d60eef8fe&type=Server"
 }
 
--- delay sebelum join (detik)
-local DELAY = 10
+local DELAY = 12
 
--- =================================
+-- ==================
 
 print("Pilih Private Server:")
 for i = 1, #PS do
@@ -21,7 +18,6 @@ end
 
 io.write("Nomor: ")
 
--- FIX stdin biar ga auto-enter
 local pilih
 local tty = io.open("/dev/tty", "r")
 if tty then
@@ -37,7 +33,7 @@ if not pilih or not PS[pilih] then
 end
 
 print("Buka Roblox...")
-os.execute("am start -p " .. PKG)
+os.execute("monkey -p " .. PKG .. " -c android.intent.category.LAUNCHER 1")
 
 os.execute("sleep " .. DELAY)
 
