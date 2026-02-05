@@ -47,11 +47,11 @@ if not PS[ps] then
   os.exit()
 end
 
-print("Buka Roblox...")
+print("Join PS...")
 os.execute(
-  "am start -a android.intent.action.MAIN " ..
-  "-c android.intent.category.LAUNCHER " ..
-  "-p " .. PKG
+  'am start -a android.intent.action.VIEW ' ..
+  '-d "'..PS[ps]..'" ' ..
+  '-p '..PKG
 )
 
 os.execute("sleep "..DELAY)
