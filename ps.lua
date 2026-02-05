@@ -1,4 +1,5 @@
 -- ===== CONFIG =====
+local PKG = "com.roblox.clientb"
 
 local PS = {
   "https://www.roblox.com/share?code=91fbc202237dca4b820fcdec8723282b&type=Server",
@@ -6,7 +7,6 @@ local PS = {
 }
 
 local DELAY = 12
-
 -- ==================
 
 print("Pilih Private Server:")
@@ -15,30 +15,27 @@ for i = 1, #PS do
 end
 
 io.write("Nomor: ")
-
-local pilih
-local tty = io.open("/dev/tty", "r")
-if tty then
-  pilih = tonumber(tty:read("*l"))
-  tty:close()
-else
-  pilih = tonumber(io.read())
-end
+local tty = io.open("/dev/tty","r")
+local pilih = tonumber(tty and tty:read("*l") or io.read())
+if tty then tty:close() end
 
 if not pilih or not PS[pilih] then
   print("Pilihan salah")
   os.exit()
 end
 
--- buka Roblox via URL (AMAN UNTUK CLONE)
-print("Buka Roblox...")
-os.execute('am start -a android.intent.action.VIEW -d "https://www.roblox.com/home"')
+print("Buka Roblox clone...")
+os.execute(
+  "am start -a android.intent.action.MAIN " ..
+  "-c android.intent.category.LAUNCHER " ..
+  "-p " .. PKG
+)
 
--- tunggu app siap
 os.execute("sleep " .. DELAY)
 
--- join private server
 print("Join Private Server...")
-os.execute('am start -a android.intent.action.VIEW -d "' .. PS[pilih] .. '"')
+os.execute(
+  'am start -a android.intent.action.VIEW -d "' .. PS[pilih] .. '"'
+)
 
 os.exit()
