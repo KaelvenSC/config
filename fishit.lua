@@ -55,9 +55,9 @@ _G.FishItConfig = _G.FishItConfig or {
             "Blob Shark",
             "Ghost Shark",
         },
-        ["FARM_LOC_SECRET_SACRIFICE"] = "Ancient Ruin",
+        ["FARM_LOC_SECRET_SACRIFICE"] = "Treasure Room",
 
-        ["Minimum Rod"] = "Ares Rod",
+        ["Minimum Rod"] = "Astral Rod",
     },
     ["WebHook"] = {
         ["Link Webhook"] = "https://discord.com/api/webhooks/1462415252405883055/-QhWVA_ZkKJA46o2DKWEHw7EeGS4CXq5F4hlMuXmd-14m8BrdVkejzfddx0mSmgXi5_a",
@@ -75,11 +75,11 @@ _G.FishItConfig = _G.FishItConfig or {
     },
     ["Potions"] = {
         ["Auto Use"] = true,
-        ["Minimum Rod"] = "Ares Rod",
+        ["Minimum Rod"] = "Astral Rod",
     },
     ["Totems"] = {
         ["Auto Use"] = true,
-        ["Minimum Rod"] = "Ghostfinn Rod",
+        ["Minimum Rod"] = "Astral Rod",
         ["Buy List"] = {
             ["Luck Totem"] = 5,
             "Mutation Totem",
@@ -126,11 +126,12 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Buy List"] = {
             "Midnight Rod",
             "Luck Rod",
+            "Astral Rod,
             "Ares Rod",
         },
         ["Location Rods"] = {
             ["Fisherman Island"] = {"Starter Rod"},
-            ["Treasure Room"] = {"Element Rod", "Luck Rod", "Ghostfinn Rod", "Midnight Rod"},
+            ["Treasure Room"] = {"Element Rod", "Luck Rod", "Ghostfinn Rod", "Midnight Rod", "Astral Rod"},
         },
         ["Endgame"] = "",
     },
