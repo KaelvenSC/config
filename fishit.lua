@@ -41,7 +41,7 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Sell Every"] = 100,
     },
     ["Doing Quest"] = {
-        ["Auto Ghostfinn Rod"] = true,
+        ["Auto Ghostfinn Rod"] = false,
         ["Auto Element Rod"] = false,
         ["Auto Diamond Rod"] = false,
         ["Unlock Ancient Ruin"] = false,
