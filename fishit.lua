@@ -99,14 +99,16 @@ _G.FishItConfig = _G.FishItConfig or {
     ["Enchant"] = {
         ["Auto Enchant"] = true,
         ["Roll Enchant"] = false,
-        ["Evolved Roll Enchant"] = true,
+        ["Evolved Roll Enchant"] = false,
         ["Enchant List"] = {
-            "SECRET Hunter",
+            "Realer I",
         },
-        ["Second Enchant"] = false,
+        ["Second Enchant"] = true,
         ["Allowed Sacrifice"] = {
             "Frostborn Shark",
             "Cryoshade Glider",
+            "Queen Crab",
+            "King Crab",
         },
         ["Second Enchant List"] = {
             "Reeler I",
@@ -118,6 +120,8 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Buy List"] = {
             "Midnight Bait",
             "Corrupt Bait",
+            "Floral Bait",
+            "Singularity Bait",
         },
         ["Endgame"] = "",
     },
