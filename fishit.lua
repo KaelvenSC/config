@@ -17,7 +17,7 @@ _G.FishItConfig = _G.FishItConfig or {
     },
     ["Auto Trade"] = {
         ["Enabled"] = true,
-        ["Whitelist Username"] = {"fahpiiwow"},
+        ["Whitelist Username"] = {"FahPiiWoW"},
         ["Category Fish"] = {
             "Secret",
             -- {Tier = "Mythic", Variant = "Stone"}, -- Tier + Variant
@@ -64,13 +64,13 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Sending"] = true,
         ["Category"] = {"Secret"},
 
-        ["Link Webhook Quest Complete"] = "https://discord.com/api/webhooks/1463539859430834206/Ymq3qLNmZmAecA0KV425VDcRx4QUVLrqoz9akZcUOat2lW0C-FNkLM5UtjW0t5w3Q3Ui",
+        ["Link Webhook Quest Complete"] = "https://discord.com/api/webhooks/1462415252405883055/-QhWVA_ZkKJA46o2DKWEHw7EeGS4CXq5F4hlMuXmd-14m8BrdVkejzfddx0mSmgXi5_a",
     },
     ["Weather"] = {
         ["Auto Buying"] = true,
-        ["Minimum Rod"] = "Ghostfinn Rod",
+        ["Minimum Rod"] = "Astral Rod",
         ["Weather List"] = {
-            "Wind", "Cloud", "Storm"
+            "Wind",
         },
     },
     ["Potions"] = {
@@ -79,7 +79,7 @@ _G.FishItConfig = _G.FishItConfig or {
     },
     ["Totems"] = {
         ["Auto Use"] = true,
-        ["Minimum Rod"] = "Astral Rod",
+        ["Minimum Rod"] = "Ghostfinn Rod",
         ["Buy List"] = {
             ["Luck Totem"] = 5,
             "Mutation Totem",
@@ -93,7 +93,7 @@ _G.FishItConfig = _G.FishItConfig or {
             "Megalodon Hunt",
             "Ghost Shark Hunt",
             "Shark Hunt",
-            -- ["Ancient Lochness Monster"] = true,
+            -- ["Ancient Lochness Monster"] = false,
         },
     },
     ["Enchant"] = {
@@ -101,14 +101,14 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Roll Enchant"] = false,
         ["Evolved Roll Enchant"] = false,
         ["Enchant List"] = {
-            "Realer I",
+            "Reeler I",
         },
         ["Second Enchant"] = true,
         ["Allowed Sacrifice"] = {
             "Frostborn Shark",
             "Cryoshade Glider",
-            "Queen Crab",
-            "King Crab",
+            "King Crab"
+            "Queen Crab"
         },
         ["Second Enchant List"] = {
             "Reeler I",
@@ -119,8 +119,9 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Buying"] = true,
         ["Buy List"] = {
             "Midnight Bait",
+            "Chroma Bait",
             "Corrupt Bait",
-            "Floral Bait",
+            "Aether Bait",
             "Singularity Bait",
         },
         ["Endgame"] = "",
@@ -128,16 +129,18 @@ _G.FishItConfig = _G.FishItConfig or {
     ["Rod List"] = {
         ["Auto Buying"] = true,
         ["Buy List"] = {
-            "Midnight Rod",
+            "Grass Rod",
             "Luck Rod",
+            "Midnight Rod",
             "Astral Rod",
             "Ares Rod",
+            "Angler Rod",
         },
         ["Location Rods"] = {
-            ["Fisherman Island"] = {"Starter Rod", "Luck Rod"},
-            ["Esoteric Depths"] = {"Midnight Rod"},
+            ["Fisherman Island"] = {"Starter Rod"},
+            ["Kohana Volcano"] = {"Luck Rod", "Grass Rod", "Midnight Rod"},
             ["Tropical Grove"] = {"Astral Rod"},
-            ["Treasure Room"] = {"Element Rod", "Ghostfinn Rod"},
+            ["Treasure Room"] = {"Element Rod", "Ghostfinn Rod", "Angler Rod", "Ares Rod"},
         },
         ["Endgame"] = "",
     },
@@ -145,12 +148,11 @@ _G.FishItConfig = _G.FishItConfig or {
     ["ExtremeFpsBoost"] = true,
     ["UltimatePerformance"] = false,
     ["Disable3DRender"] = false,
-    ["AutoRemovePlayer"] = false,
+    ["AutoRemovePlayer"] = true,
 
-    ["AutoReconnect"] = true,
+    ["AutoReconnect"] = false,
     ["HideGUI"] = false,
     ["EXIT_MAP_IF_DISCONNECT"] = false,
 }
 
 local s,r repeat s,r=pcall(function()return game:HttpGet("https://raw.githubusercontent.com/FnDXueyi/roblog/refs/heads/main/fishit-78c86024ea87c8eca577549807421962.lua")end)wait(1)until s;loadstring(r)()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/FnDXueyi/list/refs/heads/main/game"))()
