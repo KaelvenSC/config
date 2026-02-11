@@ -1,3 +1,5 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/FnDXueyi/list/refs/heads/main/game"))()
+
 _G.FishItConfig = _G.FishItConfig or {
     ["Fishing"] = {
         ["Auto Perfect"] = false,
@@ -12,46 +14,52 @@ _G.FishItConfig = _G.FishItConfig or {
             -- {Tier = "Secret", Variant = "Leviathan Rage"},  -- Tier + Variant
         },
 
-        ["Auto Accept Trade"] = true,
+        ["Auto Accept Trade"] = false,
         ["Auto Friend Request"] = false,
     },
+
     ["Auto Trade"] = {
         ["Enabled"] = true,
         ["Whitelist Username"] = {"FahPiiWoW"},
         ["Category Fish"] = {
-            "Secret",
-            -- {Tier = "Mythic", Variant = "Stone"}, -- Tier + Variant
-        },
+           "Secret",
+       },
         ["Fish Name"] = {
-            "Sacred Guardian Squid",
-            {Name = "Ruby", Variant = "Gemstone"},
-            -- {Variant = "Leviathan Rage"}, -- Variant Only
-        },
+           "Sacred Guardian Squid",
+           {Name = "Ruby", Variant = "Gemstone"},
+       },
         ["Item Name"] = {
-            "Evolved Enchant Stone",
-        },
+           "Evolved Enchant Stone",
+       },
     },
     ["Selling"] = {
         ["Auto Sell"] = true,
         ["Auto Sell Threshold"] = "Mythic",
-        ["Auto Sell Every"] = 100,
+        ["Auto Sell Every"] = 60,
     },
     ["Doing Quest"] = {
-        ["Auto Ghostfinn Rod"] = true,
+        ["Auto Ghostfinn Rod"] = false,
         ["Auto Element Rod"] = false,
         ["Auto Diamond Rod"] = false,
-        ["Unlock Ancient Ruin"] = false,
+        ["Unlock Ancient Ruin"] = true,
         ["Allowed Sacrifice"] = {
-            "Ghost Shark",
-            "Cryoshade Glider",
-            "Panther Eel",
-            "Queen Crab",
-            "King Crab",
-            "Giant Squid",
-            "Blob Shark",
-            "Ghost Shark",
-        },
-        ["FARM_LOC_SECRET_SACRIFICE"] = "Treasure Room",
+                "Ghost Shark",
+                "Giant Squid",
+                "Cryoshade Glider",
+                "Panther Eel",
+                "Queen Crab",
+                "King Crab",
+                "Blob Shark",
+                "Worm Fish",
+                "Skeleton Narwhal",
+                "King Jelly",
+                "Mosasaur Shark",
+                "Elshark Gran Maja",
+                "Bone Whale",
+                "Gladiator Shark",
+                "Frostborn Shark",
+            },
+        ["FARM_LOC_SECRET_SACRIFICE"] = "Ocean",
 
         ["Minimum Rod"] = "Astral Rod",
     },
@@ -71,25 +79,16 @@ _G.FishItConfig = _G.FishItConfig or {
            "Cloudy",
         },
     },
-    ["Potions"] = {
-        ["Auto Use"] = true,
-        ["Minimum Rod"] = "Astral Rod",
-    },
     ["Totems"] = {
         ["Auto Use"] = true,
         ["Minimum Rod"] = "Ghostfinn Rod",
         ["Buy List"] = {
-            ["Luck Totem"] = 5,
-            "Mutation Totem",
-            "Shiny Totem",
+            ["Mutation Totem"] = 5
         },
+    },
     ["Bait List"] = {
         ["Auto Buying"] = true,
         ["Buy List"] = {
-            "Midnight Bait",
-            "Chroma Bait",
-            "Corrupt Bait",
-            "Aether Bait",
             "Singularity Bait",
         },
         ["Endgame"] = "Singularity Bait",
@@ -98,15 +97,15 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Buying"] = true,
         ["Buy List"] = {
             "Grass Rod",
-            "Luck Rod",
             "Midnight Rod",
-            "Astral Rod"
+            "Astral Rod",
+            "Ares Rod",
+            "Angler Rod",
         },
         ["Location Rods"] = {
             ["Fisherman Island"] = {"Starter Rod"},
             ["Kohana Volcano"] = {"Luck Rod", "Grass Rod", "Midnight Rod"},
-            ["Tropical Grove"] = {"Astral Rod"},
-            ["Treasure Room"] = {"Element Rod", "Ghostfinn Rod", "Angler Rod"},
+            ["Treasure Room"] = {"Ghostfinn Rod", "Element Rod"},
         },
         ["Endgame"] = "Diamond Rod",
     },
@@ -120,7 +119,5 @@ _G.FishItConfig = _G.FishItConfig or {
     ["HideGUI"] = false,
     ["EXIT_MAP_IF_DISCONNECT"] = false,
 }
-
-script_key="F32B23F3D639BC8EA1821903BCEE5EC7";
 
 local s,r repeat s,r=pcall(function()return game:HttpGet("https://raw.githubusercontent.com/FnDXueyi/roblog/refs/heads/main/fishit-78c86024ea87c8eca577549807421962.lua")end)wait(1)until s;loadstring(r)()
