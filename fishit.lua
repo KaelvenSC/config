@@ -96,11 +96,10 @@ _G.FishItConfig = _G.FishItConfig or {
     ["Rod List"] = {
         ["Auto Buying"] = true,
         ["Buy List"] = {
+            "Luck Rod",
             "Grass Rod",
             "Midnight Rod",
             "Astral Rod",
-            "Ares Rod",
-            "Angler Rod",
         },
         ["Location Rods"] = {
             ["Fisherman Island"] = {"Starter Rod"},
