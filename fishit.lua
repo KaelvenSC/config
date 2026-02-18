@@ -38,7 +38,7 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Sell Every"] = 60,
     },
     ["Doing Quest"] = {
-        ["Auto Ghostfinn Rod"] = false,
+        ["Auto Ghostfinn Rod"] = true,
         ["Auto Element Rod"] = false,
         ["Auto Diamond Rod"] = false,
         ["Unlock Ancient Ruin"] = false,
@@ -89,9 +89,9 @@ _G.FishItConfig = _G.FishItConfig or {
     ["Bait List"] = {
         ["Auto Buying"] = true,
         ["Buy List"] = {
-            "Corrupt Bait",
+            "Midnight Bait",
         },
-        ["Endgame"] = "Corrupt Bait",
+        ["Endgame"] = "Midnight Bait",
     },
     ["Rod List"] = {
         ["Auto Buying"] = true,
