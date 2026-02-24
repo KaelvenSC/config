@@ -109,8 +109,8 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Endgame"] = "Diamond Rod",
     },
 
-    ["ExtremeFpsBoost"] = false,
-    ["UltimatePerformance"] = false,
+    ["ExtremeFpsBoost"] = true,
+    ["UltimatePerformance"] = true,
     ["Disable3DRender"] = true,
     ["AutoRemovePlayer"] = true,
 
