@@ -84,14 +84,19 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Minimum Rod"] = "Ghostfinn Rod",
         ["Buy List"] = {
             ["Mutation Totem"] = 5
+            "Luck Totem",
+            "Shiny Totem",
         },
     },
     ["Bait List"] = {
         ["Auto Buying"] = true,
         ["Buy List"] = {
             "Midnight Bait",
+            "Aether Bait",
+            "Floral Bait",
+            "Singularity Bait",
         },
-        ["Endgame"] = "Midnight Bait",
+        ["Endgame"] = "Singularity Bait",
     },
     ["Rod List"] = {
         ["Auto Buying"] = true,
@@ -100,6 +105,7 @@ _G.FishItConfig = _G.FishItConfig or {
             "Grass Rod",
             "Midnight Rod",
             "Astral Rod",
+            "Ares Rod",
         },
         ["Location Rods"] = {
             ["Fisherman Island"] = {"Starter Rod"},
