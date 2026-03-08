@@ -14,7 +14,7 @@ _G.FishItConfig = _G.FishItConfig or {
             -- {Tier = "Secret", Variant = "Leviathan Rage"},  -- Tier + Variant
         },
 
-        ["Auto Accept Trade"] = false,
+        ["Auto Accept Trade"] = true,
         ["Auto Friend Request"] = false,
     },
 
@@ -59,7 +59,7 @@ _G.FishItConfig = _G.FishItConfig or {
                 "Gladiator Shark",
                 "Frostborn Shark",
             },
-        ["FARM_LOC_SECRET_SACRIFICE"] = "Ocean",
+        ["FARM_LOC_SECRET_SACRIFICE"] = "Treasure Room",
 
         ["Minimum Rod"] = "Astral Rod",
     },
@@ -83,15 +83,39 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Use"] = true,
         ["Minimum Rod"] = "Ghostfinn Rod",
         ["Buy List"] = {
-            ["Mutation Totem"] = 5
+            ["Mutation Totem"] = 5,
+            ["Luck Totem"] = 5,
+            ["Shiny Totem"] = 1,
         },
+    },
+    ["Enchant"] = {
+        ["Auto Enchant"] = true,
+        ["Roll Enchant"] = true,
+        ["Evolved Roll Enchant"] = true,
+        ["Enchant List"] = {
+            "Reeler I",
+            "Mutation Hunter I",
+        },
+        ["Second Enchant"] = false,
+        ["Allowed Sacrifice"] = {
+            "Frostborn Shark",
+            "Cryoshade Glider",
+        },
+        ["Second Enchant List"] = {
+            "Reeler I",
+            "Mutation Hunter II",
+        },
+        ["Minimum Rod"] = "Ghostfinn Rod",
     },
     ["Bait List"] = {
         ["Auto Buying"] = true,
         ["Buy List"] = {
             "Midnight Bait",
+            "Aether Bait",
+            "Floral Bait",
+            "Singularity Bait",
         },
-        ["Endgame"] = "Midnight Bait",
+        ["Endgame"] = "Singularity Bait",
     },
     ["Rod List"] = {
         ["Auto Buying"] = true,
@@ -100,16 +124,17 @@ _G.FishItConfig = _G.FishItConfig or {
             "Grass Rod",
             "Midnight Rod",
             "Astral Rod",
+            "Ares Rod",
         },
         ["Location Rods"] = {
             ["Fisherman Island"] = {"Starter Rod"},
-            ["Kohana Volcano"] = {"Luck Rod", "Grass Rod", "Midnight Rod"},
+            ["Tropical Grove"] = {"Luck Rod", "Grass Rod", "Midnight Rod"},
             ["Treasure Room"] = {"Ghostfinn Rod", "Element Rod", "Astral Rod"},
         },
         ["Endgame"] = "Diamond Rod",
     },
 
-    ["ExtremeFpsBoost"] = true,
+    ["ExtremeFpsBoost"] = false,
     ["UltimatePerformance"] = false,
     ["Disable3DRender"] = false,
     ["AutoRemovePlayer"] = true,
@@ -119,4 +144,5 @@ _G.FishItConfig = _G.FishItConfig or {
     ["EXIT_MAP_IF_DISCONNECT"] = false,
 }
 
+script_key="F32B23F3D639BC8EA1821903BCEE5EC7";
 local s,r repeat s,r=pcall(function()return game:HttpGet("https://raw.githubusercontent.com/FnDXueyi/roblog/refs/heads/main/fishit-78c86024ea87c8eca577549807421962.lua")end)wait(1)until s;loadstring(r)()
