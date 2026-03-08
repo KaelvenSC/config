@@ -14,7 +14,7 @@ _G.FishItConfig = _G.FishItConfig or {
             -- {Tier = "Secret", Variant = "Leviathan Rage"},  -- Tier + Variant
         },
 
-        ["Auto Accept Trade"] = false,
+        ["Auto Accept Trade"] = true,
         ["Auto Friend Request"] = false,
     },
 
@@ -43,23 +43,10 @@ _G.FishItConfig = _G.FishItConfig or {
         ["Auto Diamond Rod"] = false,
         ["Unlock Ancient Ruin"] = false,
         ["Allowed Sacrifice"] = {
-                "Ghost Shark",
-                "Giant Squid",
-                "Cryoshade Glider",
-                "Panther Eel",
                 "Queen Crab",
                 "King Crab",
-                "Blob Shark",
-                "Worm Fish",
-                "Skeleton Narwhal",
-                "King Jelly",
-                "Mosasaur Shark",
-                "Elshark Gran Maja",
-                "Bone Whale",
-                "Gladiator Shark",
-                "Frostborn Shark",
             },
-        ["FARM_LOC_SECRET_SACRIFICE"] = "Ocean",
+        ["FARM_LOC_SECRET_SACRIFICE"] = "Treasure Room",
 
         ["Minimum Rod"] = "Astral Rod",
     },
@@ -88,6 +75,27 @@ _G.FishItConfig = _G.FishItConfig or {
             ["Shiny Totem"] = 1,
         },
     },
+    ["Enchant"] = {
+        ["Auto Enchant"] = true,
+        ["Roll Enchant"] = true,
+        ["Evolved Roll Enchant"] = true,
+        ["Enchant List"] = {
+            "Reeler I",
+            "Mutation Hunter I",
+            "Mutation Hunter II",
+            "Cursed I",
+        },
+        ["Second Enchant"] = true,
+        ["Allowed Sacrifice"] = {
+            "Queen Crab",
+            "King Crab",
+        },
+        ["Second Enchant List"] = {
+            "Reeler I",
+            "Mutation Hunter II",
+        },
+        ["Minimum Rod"] = "Ghostfinn Rod",
+    },
     ["Bait List"] = {
         ["Auto Buying"] = true,
         ["Buy List"] = {
@@ -109,7 +117,7 @@ _G.FishItConfig = _G.FishItConfig or {
         },
         ["Location Rods"] = {
             ["Fisherman Island"] = {"Starter Rod"},
-            ["Kohana Volcano"] = {"Luck Rod", "Grass Rod", "Midnight Rod"},
+            ["Tropical Grove"] = {"Luck Rod", "Grass Rod", "Midnight Rod"},
             ["Treasure Room"] = {"Ghostfinn Rod", "Element Rod", "Astral Rod"},
         },
         ["Endgame"] = "Diamond Rod",
