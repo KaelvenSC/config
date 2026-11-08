@@ -1325,20 +1325,6 @@ function Anim.bind(fn)
     return false
 end
 
--- Deteksi inventory lebih fleksibel: beberapa versi game memakai metatable
--- pembungkus, jadi getmetatable(v) tidak selalu sama dengan InventoryModule.
-local function isInventoryObject(v)
-    if type(v) ~= "table" then return false end
-    local ok, slots, capacity, countFn, removeFn = pcall(function()
-        return v.slots, v.capacity, v.count, v.remove
-    end)
-    return ok
-        and type(slots) == "table"
-        and tonumber(capacity) ~= nil
-        and type(countFn) == "function"
-        and type(removeFn) == "function"
-end
-
 local function isStateHolder(v)
     local fn = rawget(v, "state")
     if type(fn) ~= "function" then return false end
@@ -1383,8 +1369,22 @@ local function findRefs()
                 end)
                 if ok and isWorld then Refs.World = v end
             end
-            if not Refs.Inv and isInventoryObject(v) then
-                Refs.Inv = v
+            if not Refs.Inv then
+                -- Jangan bergantung hanya pada identitas metatable:
+                -- beberapa executor/build dapat mengembalikan wrapper metatable berbeda.
+                local ok, isInv = pcall(function()
+                    local mt = getmetatable(v)
+                    local idx = type(mt) == "table" and rawget(mt, "__index") or nil
+                    local countFn = rawget(v, "count") or (type(idx) == "table" and rawget(idx, "count"))
+                    local removeFn = rawget(v, "remove") or (type(idx) == "table" and rawget(idx, "remove"))
+                    local roomFn = rawget(v, "room") or (type(idx) == "table" and rawget(idx, "room"))
+                    return type(rawget(v, "slots")) == "table"
+                        and rawget(v, "capacity") ~= nil
+                        and type(countFn) == "function"
+                        and type(removeFn) == "function"
+                        and (type(roomFn) == "function" or getmetatable(v) == InventoryModule)
+                end)
+                if ok and isInv then Refs.Inv = v end
             end
             if not Refs.State then
                 local ok, isHolder = pcall(isStateHolder, v)
@@ -1456,24 +1456,9 @@ local function itemName(id)
 end
 
 local function invCount(id)
-    local inv = Refs.Inv
-    if not inv then return 0 end
-
-    -- Utamakan API game; jika berubah/gagal, hitung langsung dari slot.
-    local ok, n = pcall(function() return inv:count(id) end)
-    n = ok and tonumber(n) or nil
-    if n ~= nil then return n end
-
-    local total = 0
-    local okSlots, slots = pcall(function() return inv.slots end)
-    if okSlots and type(slots) == "table" then
-        for _, slot in pairs(slots) do
-            if type(slot) == "table" and tonumber(slot.id) == tonumber(id) then
-                total += math.max(0, tonumber(slot.n) or 0)
-            end
-        end
-    end
-    return total
+    if not Refs.Inv then return 0 end
+    local ok, n = pcall(function() return Refs.Inv:count(id) end)
+    return ok and n or 0
 end
 
 local function isPlaceable(id)
@@ -1906,8 +1891,19 @@ function Anim.quickRefs()
             for _, u in pairs(getUpvalues(fn)) do
                 local tu = type(u)
                 if tu == "table" then
-                    if not Refs.Inv and isInventoryObject(u) then
-                        Refs.Inv = u
+                    if not Refs.Inv then
+                        local ok, isInv = pcall(function()
+                            local mt = getmetatable(u)
+                            local idx = type(mt) == "table" and rawget(mt, "__index") or nil
+                            local countFn = rawget(u, "count") or (type(idx) == "table" and rawget(idx, "count"))
+                            local removeFn = rawget(u, "remove") or (type(idx) == "table" and rawget(idx, "remove"))
+                            local roomFn = rawget(u, "room") or (type(idx) == "table" and rawget(idx, "room"))
+                            return type(rawget(u, "slots")) == "table"
+                                and type(countFn) == "function"
+                                and type(removeFn) == "function"
+                                and (type(roomFn) == "function" or getmetatable(u) == InventoryModule)
+                        end)
+                        if ok and isInv then Refs.Inv = u end
                     end
                     if not Refs.World then
                         local ok, isWorld = pcall(function()
