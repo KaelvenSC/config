@@ -1,0 +1,711 @@
+--[[ ============================================================
+     AUTO JOIN  v1.0  --  one-button auto re-enter current world
+     Game: Ugc (112863874972771)   place version: v1200
+     Executor: Madium / Real.
+     No RightCtrl, no loadstring, no HttpGet, no Rayfield.
+
+     WHAT IT DOES
+       The game sometimes drops you back to the world-discovery
+       menu (same server, you are not disconnected). This script
+       watches that menu and, while it is open, presses the same
+       "Enter World" action once every 10 seconds.
+
+       It uses the game's OWN UI function, not a hand-made remote:
+
+         menu.enter("WORLDNAME")
+
+       That is the exact wrapper the "Enter World" button calls
+       (v1200 Game module L4511 `enter`, exported on the menu
+       table and also passed to the picker as `enter`). It hides
+       the picker, restores the HUD and updates the status text
+       exactly like a human click. No new remotes are fired and
+       no packets are crafted by hand.
+
+     HOW IT FINDS THINGS (v1200 hides its scripts)
+       The menu module (E9zevLEKGwgD) mounts a ScreenGui named
+       "MenuGui" into PlayerGui and creates one Frame per layer:
+
+           PlayerGui.MenuGui.WorldPicker.Visible == true
+             -> you are sitting in the discovery menu
+
+       The menu table itself (the mount() return value) is found
+       in the garbage collector by IDENTITY, not by name:
+
+           rawget(candidate, "screen") == PlayerGui.MenuGui
+           and candidate has enter() / openPicker()
+
+       Its `enter` closure keeps the game's argument table as an
+       upvalue; that table has currentWorld() (returns the world
+       name) and enter() (the raw join). So we read the name and
+       call the UI wrapper. Nothing is guessed.
+
+       Fallback if the UI table cannot be found: scan for the
+       world table by shape (goTo + w + h + name + enter) and
+       call world.enter(name) directly, then hide the picker.
+
+     SHAPE, NOT NAME
+       v1200 unparents and renames its modules every server.
+       Shapes ("has these functions") are stable, names are not.
+
+     USE
+       Run once. One button toggles it.
+         OFF -> do nothing (browse worlds normally)
+         ON  -> while the picker is open, rejoin the current
+                world every 10 seconds until it succeeds.
+                After 6 failures in a row it slows to 30 s
+                (a world that no longer exists should not be
+                hammered); any success resets the timer.
+       Re-running the script destroys the old panel and stops
+       the old loop; it does not stack.
+   ============================================================ ]]
+
+local TAG = "[AJ]"
+
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local TS = game:GetService("TeleportService")
+local LP = Players.LocalPlayer
+
+local function say(...)
+    local parts = {}
+    for i = 1, select("#", ...) do
+        parts[#parts + 1] = tostring(select(i, ...))
+    end
+    print(TAG, table.concat(parts, " "))
+end
+
+-- ------------------------------------------------------------ executor API
+-- IMPORTANT: Real hands the script an EMPTY _G. Executor functions are only
+-- reachable as direct globals, so never do _G["getgc"] etc.
+local API = {
+    getgc          = type(getgc) == "function" and getgc or nil,
+    getupvalues    = type(getupvalues) == "function" and getupvalues or nil,
+    getconnections = type(getconnections) == "function" and getconnections or nil,
+}
+
+-- optional shared env (cache + last world name)
+local genv = nil
+if type(getgenv) == "function" then
+    local ok, g = pcall(getgenv)
+    if ok and type(g) == "table" then genv = g end
+end
+
+-- ------------------------------------------------------------ helpers
+-- rawget never runs __index, so a table with a hostile metatable cannot
+-- abort the scan (this used to crash an older build).
+local function rawField(t, k)
+    if type(t) ~= "table" then return nil end
+    return rawget(t, k)
+end
+
+-- getupvalues with debug fallback; returns a plain array
+local function upsOf(fn)
+    local out = {}
+    if type(fn) ~= "function" then return out end
+    if API.getupvalues then
+        local ok, u = pcall(API.getupvalues, fn)
+        if ok and type(u) == "table" then
+            for k, v in pairs(u) do
+                if type(k) == "number" then out[#out + 1] = v end
+            end
+            if #out > 0 then return out end
+            out = {}
+        end
+    end
+    if type(debug) == "table" and type(debug.getupvalue) == "function" then
+        for i = 1, 200 do
+            local ok, name, val = pcall(debug.getupvalue, fn, i)
+            if not ok or name == nil then break end
+            out[i] = val
+        end
+    end
+    return out
+end
+
+-- world table shape (same test modmove uses)
+local function isWorld(t)
+    if type(t) ~= "table" then return false end
+    return type(rawget(t, "goTo")) == "function"
+        and type(rawget(t, "w")) == "number"
+        and type(rawget(t, "h")) == "number"
+end
+
+-- menu mount() return value: the ScreenGui it created is a raw field
+local function isMenuTable(t, mgui)
+    if type(t) ~= "table" then return false end
+    if rawget(t, "screen") ~= mgui then return false end
+    return type(rawget(t, "enter")) == "function"
+        and type(rawget(t, "openPicker")) == "function"
+        and type(rawget(t, "layers")) == "table"
+end
+
+-- the game's argument table, reachable through the menu closures
+local function isMenuArgs(t)
+    if type(t) ~= "table" then return false end
+    return type(rawget(t, "currentWorld")) == "function"
+        and type(rawget(t, "enter")) == "function"
+end
+
+-- ------------------------------------------------------------ discovery
+local function eachGcTable(fn)
+    if not API.getgc then return 0 end
+    local ok, gc = pcall(API.getgc, true)
+    if not ok or type(gc) ~= "table" then ok, gc = pcall(API.getgc) end
+    if not ok or type(gc) ~= "table" then return 0 end
+    local n = 0
+    for _, v in ipairs(gc) do
+        if type(v) == "table" then
+            n = n + 1
+            if fn(v) then return n end
+        end
+    end
+    return n
+end
+
+local function findMenu(mgui)
+    local hit = nil
+    eachGcTable(function(v)
+        if isMenuTable(v, mgui) then
+            hit = v
+            return true
+        end
+        return false
+    end)
+    return hit
+end
+
+local function findArgs(menu)
+    for _, field in ipairs({ "enter", "openPicker", "blocking", "closeDialogs" }) do
+        local fn = rawField(menu, field)
+        if type(fn) == "function" then
+            for _, u in ipairs(upsOf(fn)) do
+                if isMenuArgs(u) then return u end
+            end
+        end
+    end
+    return nil
+end
+
+local function findWorld()
+    local strict, loose = nil, nil
+    eachGcTable(function(v)
+        if not loose and isWorld(v) then loose = v end
+        if isWorld(v) and type(rawget(v, "enter")) == "function"
+            and type(rawget(v, "name")) == "string" then
+            strict = v
+            return true
+        end
+        return false
+    end)
+    return strict or loose
+end
+
+-- ------------------------------------------------------------ no-getgc route
+-- On an executor without getgc we can still reach the menu's own enter
+-- wrapper through the buttons' Activated connections:
+--
+--   button.Activated  ->  callback (upvalue: enter wrapper)
+--   enter wrapper     ->  upvalue: the game's argument table (a2)
+--
+-- a2 has currentWorld() (name) and enter() (raw join).  The wrapper itself
+-- is the UI function, so calling it is exactly a human click.
+local function connFunction(c)
+    local ok, f = pcall(function() return c.Function end)
+    if ok and type(f) == "function" then return f end
+    ok, f = pcall(function() return c.func end)
+    if ok and type(f) == "function" then return f end
+    return nil
+end
+
+-- Connection chain the game builds for every menu button:
+--
+--   Activated -> cb (upvalues: sound module, a7)
+--   a7        -> function() enter(i9) end
+--   a7 upvals -> enter wrapper + i9
+--   wrapper   -> upvalues: a2 (args), the WorldPicker frame, hud, ...
+--
+-- So walk two hops and require the found function to close over BOTH the
+-- args table and the picker frame. That rejects any other menu function
+-- that also happens to close over a2 (hud does).
+local function wrapperFromCallback(cb, picker)
+    for _, a7 in ipairs(upsOf(cb)) do
+        if type(a7) == "function" then
+            local bestW, bestA = nil, nil
+            for _, w in ipairs(upsOf(a7)) do
+                if type(w) == "function" then
+                    local a, hasPicker = nil, false
+                    for _, u in ipairs(upsOf(w)) do
+                        if isMenuArgs(u) then a = u end
+                        if u == picker then hasPicker = true end
+                    end
+                    if a then
+                        if hasPicker then return w, a end
+                        if not bestW then bestW, bestA = w, a end
+                    end
+                end
+            end
+            if bestW then return bestW, bestA end
+        end
+    end
+    return nil, nil
+end
+
+local function findEnterViaGui(mgui)
+    if not API.getconnections then return nil, nil end
+    local picker = mgui:FindFirstChild("WorldPicker")
+    if not picker then return nil, nil end
+    local okDesc, descendants = pcall(function() return picker:GetDescendants() end)
+    if not okDesc or type(descendants) ~= "table" then return nil, nil end
+
+    for _, d in ipairs(descendants) do
+        local okCls, cls = pcall(function() return d.ClassName end)
+        if okCls and (cls == "TextButton" or cls == "ImageButton") then
+            local okSig, sig = pcall(function() return d.Activated end)
+            if okSig and sig then
+                local okC, conns = pcall(API.getconnections, sig)
+                if okC and type(conns) == "table" then
+                    for _, c in ipairs(conns) do
+                        local fn = connFunction(c)
+                        if fn then
+                            local wrapper, a = wrapperFromCallback(fn, picker)
+                            if wrapper then return wrapper, a end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return nil, nil
+end
+
+-- ------------------------------------------------------------ live state
+local function playerGui()
+    local ok, pg = pcall(function() return LP:FindFirstChild("PlayerGui") end)
+    if ok and pg then return pg end
+    return nil
+end
+
+-- The ScreenGui is called "MenuGui" in v1200, but find it by its
+-- "WorldPicker" layer instead of trusting the name.  A rename then
+-- cannot blind us.
+local function findMenuGui(pg)
+    if not pg then return nil end
+    local direct = pg:FindFirstChild("MenuGui")
+    if direct and direct:FindFirstChild("WorldPicker") then return direct end
+    for _, c in ipairs(pg:GetChildren()) do
+        local okCls, cls = pcall(function() return c.ClassName end)
+        if okCls and cls == "ScreenGui" then
+            local okW, w = pcall(function() return c:FindFirstChild("WorldPicker") end)
+            if okW and w then return c end
+        end
+    end
+    return nil
+end
+
+local function pickerParts()
+    local pg = playerGui()
+    if not pg then return nil, nil end
+    local mgui = findMenuGui(pg)
+    if not mgui then return nil, nil end
+    local picker = mgui:FindFirstChild("WorldPicker")
+    return mgui, picker
+end
+
+local function pickerVisible()
+    local _, picker = pickerParts()
+    if not picker then return false end
+    local ok, vis = pcall(function() return picker.Visible end)
+    return ok and vis == true
+end
+
+local function hidePicker()
+    local _, picker = pickerParts()
+    if picker then
+        pcall(function() picker.Visible = false end)
+    end
+end
+
+-- ------------------------------------------------------------ UI
+local function setFont(obj, name)
+    pcall(function() obj.Font = Enum.Font[name] end)
+end
+
+local pg = playerGui()
+if not pg then
+    say("PlayerGui not found -- is the game loaded?")
+    return
+end
+
+local old = pg:FindFirstChild("AutoJoinGui")
+if old then old:Destroy() end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "AutoJoinGui"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.DisplayOrder = 9999
+gui.Parent = pg
+
+local panel = Instance.new("Frame")
+panel.Name = "Panel"
+panel.Size = UDim2.fromOffset(216, 104)
+panel.Position = UDim2.new(0.5, -108, 0, 86)
+panel.BackgroundColor3 = Color3.fromRGB(24, 24, 30)
+panel.BorderSizePixel = 0
+panel.Active = true
+panel.Parent = gui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = panel
+
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(72, 72, 88)
+stroke.Thickness = 1
+stroke.Parent = panel
+
+local title = Instance.new("TextLabel")
+title.Name = "Title"
+title.Size = UDim2.new(1, -20, 0, 22)
+title.Position = UDim2.fromOffset(10, 4)
+title.BackgroundTransparency = 1
+title.Text = "AUTO JOIN"
+title.TextColor3 = Color3.fromRGB(240, 240, 245)
+title.TextSize = 14
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Active = true
+setFont(title, "GothamBold")
+title.Parent = panel
+
+local hint = Instance.new("TextLabel")
+hint.Name = "Hint"
+hint.Size = UDim2.new(1, -20, 0, 14)
+hint.Position = UDim2.fromOffset(10, 4)
+hint.BackgroundTransparency = 1
+hint.Text = "drag"
+hint.TextColor3 = Color3.fromRGB(110, 110, 125)
+hint.TextSize = 10
+hint.TextXAlignment = Enum.TextXAlignment.Right
+setFont(hint, "Gotham")
+hint.Parent = panel
+
+local worldLine = Instance.new("TextLabel")
+worldLine.Name = "World"
+worldLine.Size = UDim2.new(1, -20, 0, 16)
+worldLine.Position = UDim2.fromOffset(10, 24)
+worldLine.BackgroundTransparency = 1
+worldLine.Text = "world: --"
+worldLine.TextColor3 = Color3.fromRGB(170, 170, 185)
+worldLine.TextSize = 11
+worldLine.TextXAlignment = Enum.TextXAlignment.Left
+setFont(worldLine, "Gotham")
+worldLine.Parent = panel
+
+local toggle = Instance.new("TextButton")
+toggle.Name = "Toggle"
+toggle.Size = UDim2.new(1, -20, 0, 30)
+toggle.Position = UDim2.fromOffset(10, 42)
+toggle.BackgroundColor3 = Color3.fromRGB(58, 58, 72)
+toggle.BorderSizePixel = 0
+toggle.Text = "AUTO JOIN: OFF"
+toggle.TextColor3 = Color3.fromRGB(235, 235, 240)
+toggle.TextSize = 13
+toggle.AutoButtonColor = true
+setFont(toggle, "GothamBold")
+toggle.Parent = panel
+
+local tcorner = Instance.new("UICorner")
+tcorner.CornerRadius = UDim.new(0, 6)
+tcorner.Parent = toggle
+
+local status = Instance.new("TextLabel")
+status.Name = "Status"
+status.Size = UDim2.new(1, -20, 0, 16)
+status.Position = UDim2.fromOffset(10, 78)
+status.BackgroundTransparency = 1
+status.Text = "idle"
+status.TextColor3 = Color3.fromRGB(140, 140, 155)
+status.TextSize = 10
+status.TextXAlignment = Enum.TextXAlignment.Left
+status.TextTruncate = Enum.TextTruncate.AtEnd
+setFont(status, "Gotham")
+status.Parent = panel
+
+-- ------------------------------------------------------------ dragging
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+title.InputBegan:Connect(function(input)
+    if not gui.Parent then return end
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = panel.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if not gui.Parent or not dragging then return end
+    if input.UserInputType ~= Enum.UserInputType.MouseMovement
+        and input.UserInputType ~= Enum.UserInputType.Touch then
+        return
+    end
+    local delta = input.Position - dragStart
+    panel.Position = UDim2.new(
+        startPos.X.Scale, startPos.X.Offset + delta.X,
+        startPos.Y.Scale, startPos.Y.Offset + delta.Y
+    )
+end)
+
+-- ------------------------------------------------------------ controls
+local on = false
+local JOIN_EVERY = 10.0      -- seconds between join attempts
+local SLOW_EVERY = 30.0      -- back off after repeated failures
+local busy = false
+local lastTry = 0
+local joined = 0
+local fails = 0
+
+-- If the world is gone, hammering the same join RPC every 10 s forever is
+-- pointless.  After 6 failures in a row, slow down; any success resets it.
+local function interval()
+    if fails >= 6 then return SLOW_EVERY end
+    return JOIN_EVERY
+end
+
+local function setStatus(text)
+    pcall(function() status.Text = tostring(text) end)
+end
+
+local function setOn(v, quiet)
+    on = v and true or false
+    if on then
+        toggle.Text = "AUTO JOIN: ON"
+        toggle.BackgroundColor3 = Color3.fromRGB(30, 140, 82)
+    else
+        toggle.Text = "AUTO JOIN: OFF"
+        toggle.BackgroundColor3 = Color3.fromRGB(58, 58, 72)
+    end
+    if not quiet then
+        say(on and "auto join ON" or "auto join OFF")
+    end
+end
+
+toggle.Activated:Connect(function()
+    setOn(not on)
+    if on then
+        say("will re-enter the current world every " .. JOIN_EVERY .. "s while the picker is open")
+    end
+end)
+
+setOn(false, true)
+
+-- ------------------------------------------------------------ resolve loop
+local menu, args, world, enterFn = nil, nil, nil, nil
+local lastResolve = 0
+local RESOLVE_EVERY = 10.0    -- GC scans are heavy; retry every 10 s only
+
+local function ensureResolved(force)
+    local now = os.clock()
+    if not force and (now - lastResolve) < RESOLVE_EVERY then return end
+    lastResolve = now
+
+    local mgui = pickerParts()
+
+    -- invalidate cache only when we actually have a screen to compare to
+    if menu and mgui and rawField(menu, "screen") ~= mgui then
+        menu, args, enterFn = nil, nil, nil
+    end
+
+    if not menu and mgui then
+        menu = findMenu(mgui)
+        if menu then say("menu UI found") end
+    end
+    if menu and not args then
+        args = findArgs(menu)
+        if args then say("world name source: menu args") end
+    end
+
+    -- no getgc (or menu table not found): use the buttons' connections
+    if not args and mgui then
+        local fn, a = findEnterViaGui(mgui)
+        if fn then
+            enterFn, args = fn, a
+            say("enter wrapper found via GUI connections")
+        end
+    end
+
+    -- if the menu's argument table could not be read, we still need the
+    -- world table for the name, even though the menu can join on its own
+    if not args and not world then
+        world = findWorld()
+        if world then say("world table found (fallback)") end
+    end
+end
+
+local function currentName()
+    if args then
+        local ok, n = pcall(args.currentWorld)
+        if ok and type(n) == "string" and n ~= "" then return n end
+    end
+    if world then
+        local n = rawField(world, "name")
+        if type(n) == "string" and n ~= "" then return n end
+    end
+    return nil
+end
+
+local function attempt(name)
+    -- preferred: the game's own UI wrapper (hides picker, restores HUD)
+    if menu and type(rawField(menu, "enter")) == "function" then
+        local ok, err = pcall(menu.enter, name)
+        return ok, err, "menu.enter"
+    end
+    -- wrapper reached through the buttons' connections (no getgc needed)
+    if type(enterFn) == "function" then
+        local ok, err = pcall(enterFn, name)
+        return ok, err, "gui.enter"
+    end
+    -- fallback: raw join, then hide the picker ourselves
+    if world and type(rawField(world, "enter")) == "function" then
+        local ok, good, msg = pcall(world.enter, name)
+        hidePicker()
+        if not ok then return false, good, "world.enter" end
+        return good ~= false, msg, "world.enter"
+    end
+    return false, "no enter function found", nil
+end
+
+local lastEvent = nil
+local lastEventAt = 0
+
+local function setEvent(text)
+    lastEvent = text
+    lastEventAt = os.clock()
+    setStatus(text)
+end
+
+-- applyWorld() can take a moment; poll instead of one fixed sleep so a
+-- slow join is not reported as a failure.
+local function waitPickerGone(timeout)
+    local t0 = os.clock()
+    while (os.clock() - t0) < timeout do
+        if not pickerVisible() then return true end
+        task.wait(0.25)
+    end
+    return not pickerVisible()
+end
+
+-- ------------------------------------------------------------ startup report
+task.spawn(function()
+    ensureResolved(true)
+    local _, picker = pickerParts()
+    local joinRoute = menu and "menu.enter"
+        or (enterFn and "gui.enter")
+        or (world and "world.enter")
+        or "none yet"
+    say(string.format("menu=%s  args=%s  world=%s  picker=%s  join=%s",
+        menu and "FOUND" or "not found",
+        args and "FOUND" or "not found",
+        world and "FOUND" or "not found",
+        picker and "FOUND" or "not found",
+        joinRoute))
+    if joinRoute == "none yet" then
+        say("waiting for the game UI / world table...")
+    end
+    local ok, vis = pcall(pickerVisible)
+    if ok then say("picker visible right now: " .. tostring(vis)) end
+end)
+
+-- ------------------------------------------------------------ main loop
+task.spawn(function()
+    while gui.Parent do
+        local now = os.clock()
+
+        ensureResolved()
+
+        local name = currentName()
+        if name and genv then
+            pcall(function() genv.__AJ_NAME = name end)
+        end
+        if not name and genv then
+            local ok, cached = pcall(function() return genv.__AJ_NAME end)
+            if ok and type(cached) == "string" and cached ~= "" then
+                name = cached
+            end
+        end
+
+        pcall(function()
+            worldLine.Text = "world: " .. (name or "--")
+        end)
+
+        local vis = pickerVisible()
+
+        if on and not busy and (now - lastTry) >= interval() then
+            if vis and name and name ~= "" then
+                lastTry = now
+                busy = true
+                local target = name
+
+                task.spawn(function()
+                    local ok, err, route = attempt(target)
+                    local gone = waitPickerGone(3.0)
+                    busy = false
+
+                    if ok and gone then
+                        joined = joined + 1
+                        fails = 0
+                        setEvent("joined " .. target .. "  (#" .. joined .. ")")
+                        say("joined " .. target .. " via " .. tostring(route))
+                    elseif ok and not gone then
+                        fails = fails + 1
+                        setEvent("still in menu - retrying")
+                        say("enter returned but the picker is still open")
+                        if fails == 6 then say("6 failed attempts - slowing to every 30s") end
+                    else
+                        fails = fails + 1
+                        setEvent("failed: " .. tostring(err))
+                        say("enter failed (" .. tostring(route) .. "): " .. tostring(err))
+                        if fails == 6 then say("6 failed attempts - slowing to every 30s") end
+                    end
+                end)
+            end
+        end
+
+        -- light status line (newer events stay visible for a few seconds)
+        if on and not busy then
+            local fresh = lastEvent and (now - lastEventAt) < 6
+            if not fresh then
+                if vis then
+                    if name then
+                        setStatus("menu open - joining every " .. interval() .. "s")
+                    else
+                        setStatus("menu open - no world name yet")
+                    end
+                elseif menu or world then
+                    setStatus("watching (in world)")
+                else
+                    setStatus("waiting for the game UI")
+                end
+            end
+        elseif not on then
+            if lastEvent and (now - lastEventAt) < 6 then
+                -- keep the last event visible after toggling off
+            else
+                setStatus("idle")
+            end
+        end
+
+        task.wait(1)
+    end
+    say("panel closed -- loop stopped")
+end)
+
+say("v1.0 loaded.  toggle the button to auto re-enter the current world")
